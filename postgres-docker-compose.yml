@@ -7,8 +7,8 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: thepass
-      POSTGRES_USER: theuser
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_USER: hodei
     ports:
       - 5432:5432
   adminer:

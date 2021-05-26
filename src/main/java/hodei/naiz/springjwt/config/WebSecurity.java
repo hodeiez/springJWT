@@ -41,6 +41,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST,SIGN_UP_URL).permitAll()//"open" urls with no authentication"
                 .antMatchers(HttpMethod.GET,PUBLIC_URL).permitAll() //"open" urls with no authentication"
+                .antMatchers(
+                        "/v2/api-docs",
+                        "/swagger-resources/**",
+                        "/webjars/**" ,"/swagger-ui/**",
+                        /*Probably not needed*/ "/swagger.json")
+                .permitAll()//permit swagger to be public
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
@@ -51,6 +57,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource(){
         final UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
