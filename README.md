@@ -10,5 +10,5 @@ SpringJWTauthentication
 
   1.-Swagger ([add-swagger branch](https://github.com/hodeiez/springJWT/tree/add-swagger)) has an api documentation implemented using swagger
   
-  2.-Roles ([add-roles branch](https://github.com/hodeiez/springJWT/tree/add-roles)) different authorities managment via roles. Added a role entity to applyed for each user, an user can have multiple roles, and depending on the role has different authority (can request to an api address)
+  2.-Roles ([add-roles branch](https://github.com/hodeiez/springJWT/tree/add-roles)) different authorities managment via roles. Added a role entity to apply for each user, an user can have multiple roles, and depending on the role has different authority (can request to an api address)
   
