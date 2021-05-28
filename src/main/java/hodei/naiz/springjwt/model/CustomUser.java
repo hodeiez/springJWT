@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Hodei Eceiza
@@ -34,4 +36,8 @@ public class CustomUser {
 
   @Column(name="email", nullable = false,unique = true)
     private String email;
+
+  @ManyToMany(cascade=CascadeType.MERGE,fetch=FetchType.EAGER) //had fetch lazy exception, so, now, jpa loads all the roles
+    @JoinTable(name="rolesUsers",joinColumns =@JoinColumn(name="user_id"),inverseJoinColumns = @JoinColumn(name="roles_id"))
+    private Set<CustomRoles> roles =new HashSet<>();
 }

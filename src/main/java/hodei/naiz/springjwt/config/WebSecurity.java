@@ -1,9 +1,7 @@
 package hodei.naiz.springjwt.config;
 
 import hodei.naiz.springjwt.service.UserDetailsServiceImpl;
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,6 +28,7 @@ import static hodei.naiz.springjwt.config.SecurityConstants.SIGN_UP_URL;
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
+
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userDetailsService = userDetailsService;
@@ -41,10 +40,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST,SIGN_UP_URL).permitAll()//"open" urls with no authentication"
                 .antMatchers(HttpMethod.GET,PUBLIC_URL).permitAll() //"open" urls with no authentication"
+                .antMatchers(HttpMethod.GET,"/public/admin").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET,"/public/user").hasAuthority("USER")
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), userDetailsService))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userDetailsService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
     @Override

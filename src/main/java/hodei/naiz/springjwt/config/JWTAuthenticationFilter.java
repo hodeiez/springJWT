@@ -4,11 +4,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hodei.naiz.springjwt.model.CustomUser;
+import hodei.naiz.springjwt.service.UserDetailsServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -31,16 +33,19 @@ import static hodei.naiz.springjwt.config.SecurityConstants.SECRET;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+    private final UserDetailsServiceImpl userDetailsService;
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
         this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
         setFilterProcessesUrl("/user/login");
     }
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
         try {
             CustomUser creds=new ObjectMapper().readValue(req.getInputStream(), CustomUser.class);
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(),creds.getPassword(),new ArrayList()));
+
+            UserDetails userDetails=userDetailsService.loadUserByUsername(creds.getUsername()); //I needed the authorities, so I inject userDetails and use here
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(),creds.getPassword(), userDetails.getAuthorities()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

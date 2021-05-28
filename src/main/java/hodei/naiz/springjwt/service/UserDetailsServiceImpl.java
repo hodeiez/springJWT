@@ -5,16 +5,20 @@ package hodei.naiz.springjwt.service;
 
 
 
+import hodei.naiz.springjwt.model.CustomRoles;
 import hodei.naiz.springjwt.model.CustomUser;
 import hodei.naiz.springjwt.repo.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static java.util.Collections.emptyList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by Hodei Eceiza
@@ -33,12 +37,23 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username){
+    public UserDetails loadUserByUsername(String username) {
         CustomUser customUser = userRepository.findByUsername(username);
-                //userRepository.findByUsername(username);
-        if(customUser ==null){
+        //userRepository.findByUsername(username);
+        if (customUser == null) {
             throw new UsernameNotFoundException("Didn't find User!");
         }
-        return new User(customUser.getUsername(), customUser.getPassword(), emptyList());
+        return new User(customUser.getUsername(), customUser.getPassword(), getAuthorities(customUser)); //added authorities
+    }
+
+    private Collection<GrantedAuthority> getAuthorities(CustomUser user) {
+        Set<CustomRoles> userRoles = user.getRoles();
+        Collection<GrantedAuthority> authorities = new ArrayList<>(userRoles.size());
+        for (CustomRoles usersRoles : userRoles) {
+            authorities.add(new SimpleGrantedAuthority(usersRoles.getRoleType().toUpperCase()));
+            System.out.println(usersRoles.getRoleType().toUpperCase());
+        }
+
+        return authorities;
     }
 }

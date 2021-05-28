@@ -23,13 +23,20 @@ public class UserController {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<String> saveUser(@RequestBody CustomUser customUser){
-        //TODO: use a dto to save the password encoded
+    public ResponseEntity<String> registerUser(@RequestBody CustomUser customUser){
 
+        if(userService.findUser(customUser.getUsername())==null){
+
+            //TODO: use a dto to save the password encoded
         String pass=bCryptPasswordEncoder.encode(customUser.getPassword());
         customUser.setPassword(pass);
-        userService.saveUser(customUser);
-       return ResponseEntity.ok(customUser.getFirstName()+" has been saved");
+
+
+        userService.register(customUser);
+       return ResponseEntity.ok(customUser.getFirstName()+" has been saved");}
+        else{
+            return ResponseEntity.badRequest().body("username is already taken,write a new one");
+        }
     }
 
 }

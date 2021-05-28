@@ -2,12 +2,12 @@ package hodei.naiz.springjwt.config;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import hodei.naiz.springjwt.service.UserDetailsServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,8 +27,11 @@ import static hodei.naiz.springjwt.config.SecurityConstants.*;
  */
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-    public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
+    private UserDetailsServiceImpl userDetailsService; //manually injected to get the authorities
+
+    public JWTAuthorizationFilter(AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
         super(authenticationManager);
+        this.userDetailsService = userDetailsService;
     }
     //check the authorization header,if not present runs filter, if header is present run getAuthentication
     @Override
@@ -49,7 +52,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         if(token !=null){
             String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build().verify(token.replace(TOKEN_PREFIX,"")).getSubject();
             if(user!=null){
-                return new UsernamePasswordAuthenticationToken(user,null,new ArrayList<>());
+                UserDetails userDetails= userDetailsService.loadUserByUsername(user); //using userDetailsService to get the authority (AKA the role)
+                return new UsernamePasswordAuthenticationToken(user,null, userDetails.getAuthorities());
             }
             return null;
         }

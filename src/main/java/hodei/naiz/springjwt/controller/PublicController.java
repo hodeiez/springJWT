@@ -20,4 +20,13 @@ public class PublicController {
     public String hello(){
         return "hello this is a public API :)";
     }
+    @GetMapping("/admin")
+    public String forAdmin(){
+        return "this is only for admin :)";
+
+    }
+    @GetMapping("/user")
+    public String forUser(){
+        return "this is only for user :)";
+    }
 }
