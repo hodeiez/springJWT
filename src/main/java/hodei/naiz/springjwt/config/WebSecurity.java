@@ -44,6 +44,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/public/user").hasAuthority("USER")
                 .anyRequest().authenticated()
                 .and()
+                //.oauth2Login().permitAll().and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), userDetailsService))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), userDetailsService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

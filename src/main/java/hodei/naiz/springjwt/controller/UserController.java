@@ -4,6 +4,7 @@ import hodei.naiz.springjwt.model.CustomUser;
 import hodei.naiz.springjwt.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,11 @@ public class UserController {
         else{
             return ResponseEntity.badRequest().body("username is already taken,write a new one");
         }
+    }
+    @GetMapping("/details")
+    public ResponseEntity<CustomUser> getDetails(){
+//TODO: use a dto to retrieve data without password
+        return ResponseEntity.ok(userService.getOwnDetails());
     }
 
 }
